@@ -4,6 +4,20 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import math
 import numpy as np
+from PIL import Image
+from PIL import *
+
+texture = None
+def load_texture():
+    global texture
+    texture = glGenTextures(1) 
+    glBindTexture(GL_TEXTURE_2D, texture)  
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)  
+    image = Image.open("bus.png").convert("RGBA")
+    flipped_image = image.transpose(Image.FLIP_TOP_BOTTOM)  
+    img_data = flipped_image.tobytes()  
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, flipped_image.width, flipped_image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE , img_data)  
+
 
 def drawPolygon(points, color):
     glBegin(GL_POLYGON)
@@ -45,16 +59,16 @@ def drawCircle(center,radius,color):
 
 
 blueBuilding=[(10,100),(90,100),(90,270),(10,270)]
-depths_blueBuilding=[(90,100),(95,110),(95,260),(90,270)]
+depthBlueBuilding=[(90,100),(95,110),(95,260),(90,270)]
 purpleBuilding=[(98,120),(168,120),(168,270),(98,270)]
-depths_purpleBuilding=[(168,120),(173,130),(173,260),(168,270)]
+depthPurpleBuilding=[(168,120),(173,130),(173,260),(168,270)]
 redBuilding=[(245,100),(330,100),(330,270),(245,270)]
-depths_redBuilding=[(330,100),(335,110),(335,260),(330,270)]
+depthRedBuilding=[(330,100),(335,110),(335,260),(330,270)]
 tower=[(336,100),(375,100),(375,270),(336,270)]
 towerHead=[(336,100),(355,80),(375,100)]
 towerStick=[(355,80),(356,80),(356,60),(356,60)]
 sherpaBuilding=[(520,100),(620,100),(620,270),(520,270)]
-depths_sherpaBuilding=[(620,100),(635,110),(635,260),(620,270)]
+depthSherpaBuilding=[(620,100),(635,110),(635,260),(620,270)]
 greenBuilding=[(375,130),(520,130),(520,270),(375,270)]
 #purple building windows
 purpleBuildingWindow1=[(103,200),(128,200),(128,215),(103,215)]
@@ -130,21 +144,22 @@ redCarRearWindow=[(353,285),( 405,285),(419,335),(353,335)]
 lighterRectangulars=[(0,270),(800,270),(800,330),(0,330)]
 darkerRectangulars=[(0,330),(800,330),(800,400),(0,400)]
 #traffic lights
-rectangular_base=[(660,140),(670,140),(670,325),(660,325)] 
-rectangular_head=[(645,120),(685,120),(685,200),(645,200)]
+rectangularBase=[(660,140),(670,140),(670,325),(660,325)] 
+rectangularHead=[(645,120),(685,120),(685,200),(645,200)]
 #garden 
 gardenRectangulars=[(0,150),(800,150),(800,270),(0,270)]
 #sky
 skyHigherRectangles=[(0,0),(800,0),(800,150),(0,150)]
 #street light
-StreetLightRectangular=[(180,230),(190,230),(190,325),(180,325)] 
-StreetHeads=[(180,230),(195,220),(210,230)]
-StreetLights=[(195,230),(205,230),(205,250),(195,250)]
+streetLightRectangular=[(180,230),(190,230),(190,325),(180,325)] 
+streetHeads=[(180,230),(195,220),(210,230)]
+streetLights=[(195,230),(205,230),(205,250),(195,250)]
 #aeroplane 
-body_points = [(640, 70), (660, 70), (660, 90), (640, 90)]
-wing_points = [(660, 80), (680, 80), (660, 90), (640, 90)]
-tail_points = [(640, 80), (640, 90), (630, 85)]
-cockpit_points = [(645, 80), (650, 80), (650, 85), (645, 85)]
+bodyPoints = [(640, 70), (660, 70), (660, 90), (640, 90)]
+wingPoints = [(660, 80), (680, 80), (660, 90), (640, 90)]
+tailPoints = [(640, 80), (640, 90), (630, 85)]
+cockpitPoints = [(645, 80), (650, 80), (650, 85), (645, 85)]
+
 #colors
 BLACK = (0,0,0,0)
 WHITE = (1,1,1,1)
@@ -324,17 +339,17 @@ def drawGreenBuildingWindows():
 
 def drawBuildings():
     drawRectangle(points=blueBuilding,color=BLUE)
-    drawRectangle(points=depths_blueBuilding,color=BLUE)
+    drawRectangle(points=depthBlueBuilding,color=BLUE)
     drawRectangle(points=purpleBuilding,color=PURPLE)
-    drawRectangle(points=depths_purpleBuilding,color=PURPLE)
+    drawRectangle(points=depthPurpleBuilding,color=PURPLE)
     drawRectangle(points=redBuilding,color=RED)
-    drawRectangle(points=depths_redBuilding,color=RED)
+    drawRectangle(points=depthRedBuilding,color=RED)
     drawRectangle(points=tower,color=DARK_BROWN)
     drawTriangle(points=towerHead,color=DARK_BROWN)
     drawRectangle(points=towerStick,color=DARK_BROWN)
     drawRectangle(points=greenBuilding,color=GREEN )
     drawRectangle(points=sherpaBuilding,color=SHERPA_BLUE)    
-    drawRectangle(points=depths_sherpaBuilding,color=SHERPA_BLUE)
+    drawRectangle(points=depthSherpaBuilding,color=SHERPA_BLUE)
 
 
 def drawBlueCar():    
@@ -358,16 +373,16 @@ def drawRedCar():
 
     
 def drawTrafficLight(cred, cgreen):
-    drawRectangle(points=rectangular_base,color=BLACK)
-    drawRectangle(points=rectangular_head,color=GREY)
+    drawRectangle(points=rectangularBase,color=BLACK)
+    drawRectangle(points=rectangularHead,color=GREY)
     drawCircle(center=(665,135),radius=11,color=cred)
     drawCircle(center=(665,160),radius=11,color=YELLOW)
     drawCircle(center=(665,185),radius=11,color=cgreen)
 
 def drawStreetLight():
-    drawRectangle(points=StreetLightRectangular,color=BLACK)
-    drawTriangle(points=StreetHeads,color=BLACK)
-    drawRectangle(points=StreetLights,color=(1,1,1,1))
+    drawRectangle(points=streetLightRectangular,color=BLACK)
+    drawTriangle(points=streetHeads,color=BLACK)
+    drawRectangle(points=streetLights,color=(1,1,1,1))
 
 
 def drawTree():
@@ -410,11 +425,31 @@ def drawClouds():
     drawCircle(center=(100 + 60 + 300,40),radius=10,color=WHITE)
 
 
-def draw_aeroplane():
-    drawPolygon(points=body_points,color= GREY)
-    drawPolygon(points=wing_points,color= LIGHT_GREY)
-    drawPolygon(points=tail_points,color= DARK_GREY)
-    drawPolygon(points=cockpit_points,color= BLUE)
+def drawAeroplane():
+    drawPolygon(points=bodyPoints,color= GREY)
+    drawPolygon(points=wingPoints,color= LIGHT_GREY)
+    drawPolygon(points=tailPoints,color= DARK_GREY)
+    drawPolygon(points=cockpitPoints,color= BLUE)
+
+
+def drawBus():
+    glEnable(GL_TEXTURE_2D)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    glColor4f(1.0, 1.0, 1.0, 1)
+    glBindTexture(GL_TEXTURE_2D, texture)
+    glBegin(GL_QUADS)
+    glTexCoord2f(0.0, 0.0)
+    glVertex2f(455, 500)
+    glTexCoord2f(1.0, 0.0)
+    glVertex2f(850, 500)
+    glTexCoord2f(1.0, 1.0)
+    glVertex2f(850, 100)
+    glTexCoord2f(0.0, 1.0)
+    glVertex2f(455, 100)
+    glEnd()
+    glDisable(GL_TEXTURE_2D)
+    glDisable(GL_BLEND)
 
 
 def scene(key,x,y):
@@ -479,13 +514,14 @@ def move():
 
     glPushMatrix()
     glTranslatef(aero_pos_x, aero_pos_y, 0 )
-    draw_aeroplane()
+    drawAeroplane()
     glPopMatrix()
 
     glPushMatrix()
     glTranslatef(x_pos[1], 0, 0 )
     drawBlueCar()
     drawRedCar()
+    drawBus()
     glPopMatrix()
 
 
@@ -496,8 +532,8 @@ def update_move():
         x_pos[0] = -450
     if not stop:
         x_pos[1] += 2 #car speed
-        if x_pos[1] >= 650:
-            x_pos[1] = -450
+        if x_pos[1] >= 750:
+            x_pos[1] = -850
     aero_pos_x -= 2
     aero_pos_y -= 0.5
     if aero_pos_y == -90:
@@ -510,6 +546,6 @@ def idle():
 
 glutDisplayFunc(morningScene)
 glutKeyboardFunc(scene)
+load_texture()
 glutIdleFunc(idle)
-
 glutMainLoop()
