@@ -34,7 +34,17 @@ def drawRectangle(points,color):
     for point in points:
         glVertex2f(point[0],point[1])
     glEnd()
-    
+
+def drawRectangleLightingFirstPoint(points,color1,color2):
+    glBegin(GL_QUADS)
+
+    for point in points:
+        if point == points[0]:
+            glColor4f(*color2)
+        else:
+            glColor4f(*color1)
+        glVertex2f(point[0],point[1])
+    glEnd()   
     
 def drawTriangle(points,color):
     glBegin(GL_TRIANGLES)
@@ -185,7 +195,7 @@ traffic_green = GREEN
 traffic_red = BLACK
 
 glutInit()
-glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA)
+glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
 glutInitWindowSize(1200, 700)
 glutInitWindowPosition(450,0)
 glutCreateWindow("Car Design")
@@ -197,8 +207,8 @@ glColor3f(1,0,0)
 gluOrtho2D(0,700, 400,0)      
 glClear(GL_COLOR_BUFFER_BIT)
 
-def drawSky(color):
-    drawRectangle(points=skyHigherRectangles,color=color)
+def drawSky(color1,color2):
+    drawRectangleLightingFirstPoint(points=skyHigherRectangles,color1=color1,color2=color2)
 
 # randomised
 # def drawStarsAsPoints():
@@ -448,8 +458,8 @@ def drawBus():
     glTexCoord2f(0.0, 1.0)
     glVertex2f(455, 100)
     glEnd()
-    glDisable(GL_TEXTURE_2D)
     glDisable(GL_BLEND)
+    glDisable(GL_TEXTURE_2D)
 
 
 def scene(key,x,y):
@@ -457,10 +467,55 @@ def scene(key,x,y):
     if key == b'm':
         sky = CYAN
         sun = YELLOW
+
+        glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
+        glEnable(GL_COLOR_MATERIAL)
+
+        light_position = [0, 0, 0, 0]
+        ambient_color = WHITE 
+        diffuse_color = [1.0, 1.0, 1.0, 1.0]
+        specular_color = [1.0, 1.0, 1.0, 1.0]
+
+        material_shininess = 100
+
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position)
+        glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_color)
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_color)
+        glLightfv(GL_LIGHT0, GL_SPECULAR, specular_color)
+        
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_color)  
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_color) 
+        glMaterialfv(GL_FRONT, GL_SPECULAR, specular_color)
+        glMaterialf(GL_FRONT, GL_SHININESS, material_shininess)
         # glClear(GL_COLOR_BUFFER_BIT)
     if key == b'n':
         sky = BLACK
         sun = WHITE
+
+        glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
+        glEnable(GL_COLOR_MATERIAL)
+
+        light_position = [0, 0, 0, 0]
+        ambient_color = LIGHT_GREY
+        diffuse_color = [1.0, 1.0, 1.0, 1.0] 
+        specular_color = [1.0, 1.0, 1.0, 1.0]
+
+        material_shininess = 100
+
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position)
+        glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_color)
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_color)
+        glLightfv(GL_LIGHT0, GL_SPECULAR, specular_color)
+        
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_color) 
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_color) 
+        glMaterialfv(GL_FRONT, GL_SPECULAR, specular_color) 
+        glMaterialf(GL_FRONT, GL_SHININESS, material_shininess)
+
         # glClear(GL_COLOR_BUFFER_BIT)
     if key == b's':
         stop = True
@@ -475,8 +530,7 @@ def scene(key,x,y):
 def morningScene():
     # glClear(GL_COLOR_BUFFER_BIT)
     glutPostRedisplay()
-
-    drawSky(sky)
+    drawSky(color1=sky, color2=WHITE) 
     drawSun(sun)
     
     drawGarden()
@@ -512,10 +566,18 @@ def move():
     glPopMatrix()
     
 
+    glEnable(GL_FOG)
     glPushMatrix()
     glTranslatef(aero_pos_x, aero_pos_y, 0 )
+    #glFogi(GL_FOG_MODE, GL_EXP)
+    glFogi(GL_FOG_MODE, GL_EXP2)
+
+    glFogf(GL_FOG_DENSITY, 0.2)
+    fog_color = [1, 1, 1, 1.0]
+    glFogfv(GL_FOG_COLOR, fog_color)
     drawAeroplane()
     glPopMatrix()
+    glDisable(GL_FOG)
 
     glPushMatrix()
     glTranslatef(x_pos[1], 0, 0 )
@@ -529,7 +591,7 @@ def update_move():
     global x_pos, aero_pos_x, aero_pos_y
     x_pos[0] += 2 #cloud speed
     if x_pos[0] >= 650:
-        x_pos[0] = -450
+        x_pos[0] = -850
     if not stop:
         x_pos[1] += 2 #car speed
         if x_pos[1] >= 750:
