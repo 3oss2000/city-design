@@ -5,6 +5,14 @@ from OpenGL.GLUT import *
 import math
 import numpy as np
 
+def drawPolygon(points, color):
+    glBegin(GL_POLYGON)
+    glColor4f(*color)
+    
+    for point in points:
+        glVertex2f(point[0], point[1])
+    glEnd()
+
 def drawRectangle(points,color):
     glBegin(GL_QUADS)
     glColor4f(*color)
@@ -126,12 +134,17 @@ rectangular_base=[(660,140),(670,140),(670,325),(660,325)]
 rectangular_head=[(645,120),(685,120),(685,200),(645,200)]
 #garden 
 gardenRectangulars=[(0,150),(800,150),(800,270),(0,270)]
+#sky
 skyHigherRectangles=[(0,0),(800,0),(800,150),(0,150)]
 #street light
 StreetLightRectangular=[(180,230),(190,230),(190,325),(180,325)] 
 StreetHeads=[(180,230),(195,220),(210,230)]
-StreetLights=[(195,230),(205,230),(205,250),(195,250)] 
-
+StreetLights=[(195,230),(205,230),(205,250),(195,250)]
+#aeroplane 
+body_points = [(640, 70), (660, 70), (660, 90), (640, 90)]
+wing_points = [(660, 80), (680, 80), (660, 90), (640, 90)]
+tail_points = [(640, 80), (640, 90), (630, 85)]
+cockpit_points = [(645, 80), (650, 80), (650, 85), (645, 85)]
 #colors
 BLACK = (0,0,0,0)
 WHITE = (1,1,1,1)
@@ -139,7 +152,7 @@ CYAN = (4/255,228/255,226/255,1)
 BLUE = (0/255,0/255,255/255,1)
 DARK_BLUE = (14/255,53/255,97/255,1)
 LIGHT_GREY = (126/255,127/255,126/255,1)
-DAEK_GREY = (50/255,52/255,50/255,1)
+DARK_GREY = (50/255,52/255,50/255,1)
 RED = (226/255, 48/255, 14/255,1)
 GREEN = (2/255,128/255,1/255,1)
 LIME = (0,229/255,3/255,1)
@@ -367,7 +380,7 @@ def drawTree():
 
 def drawRoad():
     drawRectangle(points=lighterRectangulars,color=LIGHT_GREY)      
-    drawRectangle(points=darkerRectangulars,color=DAEK_GREY)
+    drawRectangle(points=darkerRectangulars,color=DARK_GREY)
 
 def drawSun(color):
     drawCircle(center=(40,40),radius=20,color=color)
@@ -395,6 +408,13 @@ def drawClouds():
     drawCircle(center=(100 + 20 + 300,40),radius=17,color=WHITE)
     drawCircle(center=(100 + 40 + 300,40),radius=17,color=WHITE)
     drawCircle(center=(100 + 60 + 300,40),radius=10,color=WHITE)
+
+
+def draw_aeroplane():
+    drawPolygon(points=body_points,color= GREY)
+    drawPolygon(points=wing_points,color= LIGHT_GREY)
+    drawPolygon(points=tail_points,color= DARK_GREY)
+    drawPolygon(points=cockpit_points,color= BLUE)
 
 
 def scene(key,x,y):
@@ -446,6 +466,8 @@ def morningScene():
 
 stop = False
 x_pos = [0,0]
+aero_pos_x = 0
+aero_pos_y = 0
 
 def move():
     glPushMatrix()
@@ -456,6 +478,11 @@ def move():
     
 
     glPushMatrix()
+    glTranslatef(aero_pos_x, aero_pos_y, 0 )
+    draw_aeroplane()
+    glPopMatrix()
+
+    glPushMatrix()
     glTranslatef(x_pos[1], 0, 0 )
     drawBlueCar()
     drawRedCar()
@@ -463,7 +490,7 @@ def move():
 
 
 def update_move():
-    global x_pos
+    global x_pos, aero_pos_x, aero_pos_y
     x_pos[0] += 2 #cloud speed
     if x_pos[0] >= 650:
         x_pos[0] = -450
@@ -471,6 +498,11 @@ def update_move():
         x_pos[1] += 2 #car speed
         if x_pos[1] >= 650:
             x_pos[1] = -450
+    aero_pos_x -= 2
+    aero_pos_y -= 0.5
+    if aero_pos_y == -90:
+        aero_pos_x = 100
+        aero_pos_y = 100
         
 def idle():
     update_move()
