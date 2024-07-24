@@ -9,6 +9,6 @@ Here's an example image from my project:
 Watch the demonstration video:
 
 <video width="320" height="240" controls>
-  <source src="video.webm" type="video/webm">
+  <source src="video.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
