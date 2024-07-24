@@ -3,7 +3,7 @@
 ## Image Example
 Here's an example image from my project:
 
-![Project Screenshot](nigh.jpg)
+![Project Screenshot](night.jpg)
 
 ## Video Example
 Watch the demonstration video:
